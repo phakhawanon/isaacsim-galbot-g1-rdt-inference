@@ -4,7 +4,11 @@ Run this standalone, in the `rdt` conda env (matching rdt-1b-galbot/README.md's
 environment) -- NOT through isaaclab.sh, and NOT in the `isaaclab` conda env:
 
     conda activate rdt
-    python inference_galbot_golf/rdt_server.py
+    ./scripts/start_rdt_server.sh
+
+(uses a relative import for its rdt_ipc sibling, so it must be launched as a module --
+the wrapper script above handles that; don't run this file directly with `python
+rdt_server.py`.)
 
 main.py (running in the isaaclab env) connects to this server over TCP and never
 imports any RDT-specific package directly, so the two conda environments'
@@ -25,14 +29,7 @@ import time
 import torch
 import yaml
 
-RDT_ROOT = os.path.normpath(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "rdt-1b-galbot")
-)
-sys.path.insert(0, RDT_ROOT)
-
-from scripts.galbot_model import create_model  # noqa: E402
-
-from rdt_ipc import (  # noqa: E402
+from .rdt_ipc import (  # noqa: E402
     CHUNK_SIZE,
     DEFAULT_BIND_HOST,
     DEFAULT_PORT,
@@ -41,6 +38,15 @@ from rdt_ipc import (  # noqa: E402
     recv_msg,
     send_msg,
 )
+
+RDT_ROOT = os.path.normpath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "rdt-1b-galbot")
+)
+sys.path.insert(0, RDT_ROOT)
+
+from scripts.galbot_model import create_model  # noqa: E402
+
+
 
 # Order the 6 image slots are decoded in -- must match the key names main.py sends.
 IMAGE_KEYS = [

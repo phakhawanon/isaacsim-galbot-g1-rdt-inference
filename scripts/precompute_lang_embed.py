@@ -7,7 +7,7 @@ there was the same as here: precompute once, then only load the small .pt file a
 inference time.
 
 Usage:
-    cd rdt-1b-galbot && python ../inference_galbot_golf/precompute_lang_embed.py
+    cd rdt-1b-galbot && python ../inference_galbot_golf/scripts/precompute_lang_embed.py
 """
 
 import os
@@ -16,8 +16,8 @@ import sys
 import torch
 import yaml
 
-RDT_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "rdt-1b-galbot")
-RDT_ROOT = os.path.normpath(RDT_ROOT)
+REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+RDT_ROOT = os.path.normpath(os.path.join(REPO_ROOT, "..", "rdt-1b-galbot"))
 sys.path.insert(0, RDT_ROOT)
 
 from models.multimodal_encoder.t5_encoder import T5Embedder  # noqa: E402
@@ -25,7 +25,8 @@ from models.multimodal_encoder.t5_encoder import T5Embedder  # noqa: E402
 GPU = 0
 MODEL_PATH = os.path.join(RDT_ROOT, "t5-v1_1-xxl")
 CONFIG_PATH = os.path.join(RDT_ROOT, "configs", "base.yaml")
-SAVE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lang_embed.pt")
+# rdt_server.py loads lang_embed.pt from its own directory, so save it there directly.
+SAVE_PATH = os.path.join(REPO_ROOT, "src", "rdt_inference", "lang_embed.pt")
 
 # Fill this in with the actual instruction for the golf task before running.
 TASK_NAME = "galbot_golf"

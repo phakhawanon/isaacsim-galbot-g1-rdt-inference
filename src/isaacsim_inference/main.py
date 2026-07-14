@@ -8,9 +8,12 @@ The galbot in the simulation is imported as an articulation.
 .. code-block:: bash
 
     # Usage
-    # Inside ~/lab/IsaacLab
     # while the isaaclab conda env is activated
-    ./isaaclab.sh -p ~/galbot-labelling/inference_galbot_golf/main.py
+    ./scripts/run_main.sh
+
+    # (sets PYTHONPATH=src so isaacsim_interface.* and rdt_inference.* resolve, then
+    # launches this file through IsaacLab's own isaaclab.sh; see scripts/run_main.sh
+    # if your IsaacLab checkout isn't at the default ~/lab/IsaacLab)
 
 """
 
@@ -49,19 +52,18 @@ from isaaclab.sim import SimulationContext
 
 # Original is GALBOT_ONE_CHARLIE_CFG
 from isaaclab_assets import (
-    ATLP_JOINT_NAME,
     RDT_JOINT_NAME,
 )
 
-from design_scene import design_scene
-from interface import (
+from isaacsim_interface.scenes.default import design_scene
+from isaacsim_interface.interface import (
     get_joint_position,
     save_camera_image,
     set_base_velocity,
     set_default_joint,
     set_joint_position,
 )
-from rdt_ipc import (
+from rdt_inference.rdt_ipc import (
     CHUNK_SIZE,
     DEFAULT_CONNECT_HOST,
     DEFAULT_PORT,
@@ -95,7 +97,7 @@ def connect_to_rdt_server(addr: tuple[str, int], timeout: float = RPC_TIMEOUT_S)
                 raise RuntimeError(
                     f"Could not connect to RDT inference server at {host}:{port} after "
                     f"{timeout:.0f}s. Start it first with:\n"
-                    "  conda activate rdt && python inference_galbot_golf/rdt_server.py"
+                    "  conda activate rdt && ./scripts/start_rdt_server.sh"
                 )
             time.sleep(1.0)
 
@@ -214,7 +216,7 @@ def main():
     set_default_joint(robot)
 
     # Connect to the RDT-1B inference server (runs separately, in the `rdt` conda env --
-    # see inference_galbot_golf/rdt_server.py)
+    # see src/rdt_inference/rdt_server.py)
     addr = parse_addr(os.environ.get("RDT_SERVER_ADDR"), f"{DEFAULT_CONNECT_HOST}:{DEFAULT_PORT}")
     sock = connect_to_rdt_server(addr)
 
