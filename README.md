@@ -33,7 +33,7 @@ scripts/
 1. Clone this repository.
 
    ```bash
-   git clone https://github.com/phakhawanon/isaacsim-galbot-g1-rdt-inference
+   git clone https://github.com/phakhawanon/rdt-inference-galbot-g1
    ```
 
 2. Set up the `isaaclab` conda environment following your local IsaacLab
