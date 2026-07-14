@@ -24,6 +24,16 @@ if [ ! -x "$ISAACLAB_PATH/isaaclab.sh" ]; then
     exit 1
 fi
 
+GALBOT_ASSETS_ROOT="${GALBOT_ASSETS_ROOT:-$HOME/galbot_one_golf_description}"
+
+if [ ! -f "$GALBOT_ASSETS_ROOT/usd/galbot_one_golf.usda" ]; then
+    echo "error: galbot_one_golf.usda not found at $GALBOT_ASSETS_ROOT/usd/galbot_one_golf.usda" >&2
+    echo "       set GALBOT_ASSETS_ROOT to your galbot_one_golf_description checkout, e.g.:" >&2
+    echo "       GALBOT_ASSETS_ROOT=/path/to/galbot_one_golf_description ./scripts/run_main.sh" >&2
+    exit 1
+fi
+
+export GALBOT_ASSETS_ROOT
 export PYTHONPATH="$REPO_ROOT/src${PYTHONPATH:+:$PYTHONPATH}"
 
 exec "$ISAACLAB_PATH/isaaclab.sh" -p "$REPO_ROOT/src/isaacsim_inference/main.py" "$@"

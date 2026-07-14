@@ -16,6 +16,7 @@ config/
   precompute_lang_embed.yaml # selects the task instruction/T5 checkpoint for precompute_lang_embed.py
 src/
   isaacsim_interface/   # Isaac Sim scene setup + robot I/O helpers
+    robots/galbot_golf.py # Galbot G1 Foxtrot ArticulationCfg + camera configs
   rdt_inference/         # RDT-1B inference server + client/server wire protocol
   isaacsim_inference/    # simulation entry point (main.py)
 scripts/
@@ -43,11 +44,11 @@ scripts/
 
 ### Deploying in Isaac Sim
 
-Since Galbot G1 Foxtrot is not a default robotic articulation provided by IsaacLab,
-user must install the robot config by themseleves.
-**The installation steps for Galbot G1 Foxtrot config will be posted here if finished**
-
 Inside the root of this repo.
+
+0. Set up the Galbot G1 Foxtrot USD asset -- see
+   [Setting up the Galbot G1 Foxtrot USD asset](#setting-up-the-galbot-g1-foxtrot-usd-asset)
+   below.
 
 1. Precompute the task's language embedding (in the `rdt` conda env, once --
    only needs to be re-run if the task instruction changes). Set the actual
@@ -85,6 +86,29 @@ Inside the root of this repo.
    default, override with `RDT_SERVER_ADDR=host:port`), streams camera +
    proprioceptive observations to it each control tick, and executes the
    returned action chunks on the simulated Galbot.
+
+### Setting up the Galbot G1 Foxtrot USD asset
+
+The robot's `ArticulationCfg` (`src/isaacsim_interface/robots/galbot_golf.py`)
+use .usda and meshes files from this repo
+[galbot_one_golf_description](https://github.com/GalaxyGeneralRobotics/galbot_one_golf_description).
+
+1. Clone it (anywhere -- it doesn't need to sit next to this repo):
+
+   ```bash
+   git lfs install
+   git clone https://github.com/GalaxyGeneralRobotics/galbot_one_golf_description
+   ```
+
+2. Point `scripts/run_main.sh` at your checkout. It defaults to
+   `~/galbot_one_golf_description`; if yours is elsewhere, override with:
+
+   ```bash
+   GALBOT_ASSETS_ROOT=/path/to/galbot_one_golf_description ./scripts/run_main.sh
+   ```
+
+   `run_main.sh` checks that `$GALBOT_ASSETS_ROOT/usd/galbot_one_golf.usda`
+   exists before launching and fails fast with a clear error if it doesn't.
 
 ### Selecting the RDT-1B model
 

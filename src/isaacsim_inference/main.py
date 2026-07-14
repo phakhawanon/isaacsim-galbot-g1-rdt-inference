@@ -51,7 +51,7 @@ from isaaclab.sensors import Camera
 from isaaclab.sim import SimulationContext
 
 # Original is GALBOT_ONE_CHARLIE_CFG
-from isaaclab_assets import (
+from isaacsim_interface.robots.galbot_golf import (
     RDT_JOINT_NAME,
 )
 

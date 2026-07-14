@@ -7,7 +7,7 @@ import isaaclab.sim as sim_utils
 from isaaclab.assets import Articulation
 from isaaclab.sensors import Camera
 
-from isaaclab_assets import (
+from isaacsim_interface.robots.galbot_golf import (
     GALBOT_ONE_GOLF_CFG,
     GALBOT_ONE_GOLF_LEFT_WRIST_CAMERA_CFG,
     GALBOT_ONE_GOLF_RIGHT_WRIST_CAMERA_CFG,

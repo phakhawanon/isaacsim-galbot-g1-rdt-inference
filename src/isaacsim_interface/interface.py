@@ -7,7 +7,7 @@ from PIL import Image
 from isaaclab.assets import Articulation
 from isaaclab.sensors import Camera
 
-from isaaclab_assets import JOINT_NAME_TO_ID_DICT
+from isaacsim_interface.robots.galbot_golf import JOINT_NAME_TO_ID_DICT
 
 
 def _convert_joint_name_to_id(
