@@ -6,7 +6,7 @@
 
 # Path to the rdt-1b-galbot checkout. Relative paths are resolved relative to this
 # repo's root (the parent of this config/ directory).
-rdt_root: "../rdt-1b-galbot"
+rdt_root: "../rdt-finetune-atlp"
 
 # CUDA device index to run the T5 encoder on.
 gpu: 0

@@ -1,7 +1,10 @@
-# isaacsim-galbot-g1-rdt-inference
+# RDT-1B Inference Server for Galbot G1
 
-IsaacLab + RDT-1B inference stack for the Galbot G1 Foxtrot task. The Galbot
-articulation is simulated in Isaac Sim and driven by actions produced by an
+This repo contains the code for running RDT-1B inference server for Galbot G1 Foxtrot.
+
+The inference server can be used to do inference for simulation in Isaac Sim, or the real Galbot G1.
+
+The Galbot articulation is simulated in Isaac Sim and driven by actions produced by an
 RDT-1B policy running as a separate, persistent inference server. The two
 halves talk to each other over a plain TCP socket, so the `isaaclab` and
 `rdt` conda environments (which pin conflicting torch/CUDA versions) never
@@ -27,8 +30,7 @@ scripts/
 
 ## Installation
 
-1. Clone this repository next to your `rdt-1b-galbot` checkout (the RDT
-   server imports it as a sibling directory):
+1. Clone this repository.
 
    ```bash
    git clone https://github.com/phakhawanon/isaacsim-galbot-g1-rdt-inference
@@ -115,13 +117,13 @@ use .usda and meshes files from this repo
 `rdt_server.py` pulls variables which specify the location of RDT-1B model from `config/rdt_server.yaml`:
 
 ```yaml
-rdt_root: "../rdt-1b-galbot"
+rdt_root: "../rdt-finetune-atlp"
 checkpoint: "checkpoints/rdt-1b-finetune/checkpoint-70000"
 vision_encoder: "google/siglip-so400m-patch14-384"
 control_frequency: 30
 ```
 
-- `rdt_root`: path to your `rdt-1b-galbot` checkout. Relative paths are
+- `rdt_root`: path to your `rdt-finetune-atlp` checkout. Relative paths are
   resolved relative to this repo's root.
 - `checkpoint`: checkpoint directory to load, relative to `rdt_root` (or an
   absolute path).
@@ -144,7 +146,7 @@ RDT_SERVER_CONFIG=/path/to/other.yaml ./scripts/start_rdt_server.sh
 `config/precompute_lang_embed.yaml`:
 
 ```yaml
-rdt_root: "../rdt-1b-galbot"
+rdt_root: "../rdt-finetune-atlp"
 gpu: 0
 t5_model: "t5-v1_1-xxl"
 task_name: "Pouring"
@@ -153,7 +155,7 @@ offload_dir: null
 save_path: "src/rdt_inference/lang_embed.pt"
 ```
 
-- `rdt_root`: path to your `rdt-1b-galbot` checkout, same convention as
+- `rdt_root`: path to your `rdt-finetune-atlp` checkout, same convention as
   `config/rdt_server.yaml`.
 - `gpu`: CUDA device index to run the T5 encoder on.
 - `t5_model`: local T5-xxl checkpoint directory, relative to `rdt_root` (or

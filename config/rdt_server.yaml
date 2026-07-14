@@ -6,7 +6,7 @@
 
 # Path to the rdt-1b-galbot checkout. Relative paths are resolved relative to this
 # repo's root (the parent of this config/ directory).
-rdt_root: "../rdt-1b-galbot"
+rdt_root: "../rdt-finetune-atlp"
 
 # Checkpoint directory to load, relative to rdt_root (or an absolute path).
 checkpoint: "checkpoints/rdt-1b-finetune/checkpoint-70000"
