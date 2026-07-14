@@ -1,0 +1,29 @@
+# Configuration for scripts/precompute_lang_embed.py.
+#
+# To use a different task/instruction without editing this file, copy it elsewhere
+# and point the script at it with:
+#   PRECOMPUTE_LANG_EMBED_CONFIG=/path/to/my_config.yaml python scripts/precompute_lang_embed.py
+
+# Path to the rdt-1b-galbot checkout. Relative paths are resolved relative to this
+# repo's root (the parent of this config/ directory).
+rdt_root: "../rdt-1b-galbot"
+
+# CUDA device index to run the T5 encoder on.
+gpu: 0
+
+# Local T5-xxl checkpoint directory, relative to rdt_root (or an absolute path).
+t5_model: "t5-v1_1-xxl"
+
+# Task name and instruction embedded into lang_embed.pt -- must be the actual
+# instruction the RDT-1B policy should condition on.
+task_name: "Pouring"
+instruction: "Pour the water into the cup"
+
+# If GPU VRAM is less than 24GB, set this to an existing directory to enable
+# CPU offloading during encoding.
+offload_dir: null
+
+# Where to save the resulting embedding. Relative paths are resolved relative to
+# this repo's root. Must point at the same file rdt_server.py loads at startup
+# (src/rdt_inference/lang_embed.pt by default) unless you move it afterwards.
+save_path: "src/rdt_inference/lang_embed.pt"

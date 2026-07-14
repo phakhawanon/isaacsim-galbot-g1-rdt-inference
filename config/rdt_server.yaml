@@ -1,0 +1,18 @@
+# Configuration for scripts/start_rdt_server.sh (src/rdt_inference/rdt_server.py).
+#
+# To use a different model/checkpoint without editing this file, copy it elsewhere
+# and point the server at it with:
+#   RDT_SERVER_CONFIG=/path/to/my_config.yaml ./scripts/start_rdt_server.sh
+
+# Path to the rdt-1b-galbot checkout. Relative paths are resolved relative to this
+# repo's root (the parent of this config/ directory).
+rdt_root: "../rdt-1b-galbot"
+
+# Checkpoint directory to load, relative to rdt_root (or an absolute path).
+checkpoint: "checkpoints/rdt-1b-finetune/checkpoint-70000"
+
+# HuggingFace model name/path for the vision encoder used to fine-tune the checkpoint above.
+vision_encoder: "google/siglip-so400m-patch14-384"
+
+# Control frequency (Hz) the checkpoint above was fine-tuned at.
+control_frequency: 30

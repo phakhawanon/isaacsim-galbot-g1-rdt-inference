@@ -6,6 +6,12 @@ what caused CUDA OOM during fine-tuning (see rdt-1b-galbot/data/NOTES.md) -- the
 there was the same as here: precompute once, then only load the small .pt file at
 inference time.
 
+The task instruction, T5 checkpoint, and rdt-1b-galbot checkout location are read
+from config/precompute_lang_embed.yaml (repo root), not hardcoded here -- see that
+file, or README.md's "Selecting the RDT-1B model" section, to change the task
+instruction. Override with PRECOMPUTE_LANG_EMBED_CONFIG=/path/to/other.yaml to avoid
+editing the default config in place.
+
 Usage:
     cd rdt-1b-galbot && python ../inference_galbot_golf/scripts/precompute_lang_embed.py
 """
@@ -17,28 +23,38 @@ import torch
 import yaml
 
 REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-RDT_ROOT = os.path.normpath(os.path.join(REPO_ROOT, "..", "rdt-1b-galbot"))
+LANG_EMBED_CONFIG_PATH = os.environ.get(
+    "PRECOMPUTE_LANG_EMBED_CONFIG", os.path.join(REPO_ROOT, "config", "precompute_lang_embed.yaml")
+)
+
+with open(LANG_EMBED_CONFIG_PATH, "r") as fp:
+    LANG_EMBED_CONFIG = yaml.safe_load(fp)
+
+RDT_ROOT = os.path.normpath(os.path.join(REPO_ROOT, LANG_EMBED_CONFIG["rdt_root"]))
 sys.path.insert(0, RDT_ROOT)
 
 from models.multimodal_encoder.t5_encoder import T5Embedder  # noqa: E402
 
-GPU = 0
-MODEL_PATH = os.path.join(RDT_ROOT, "t5-v1_1-xxl")
+GPU = LANG_EMBED_CONFIG["gpu"]
+MODEL_PATH = os.path.join(RDT_ROOT, LANG_EMBED_CONFIG["t5_model"])
 CONFIG_PATH = os.path.join(RDT_ROOT, "configs", "base.yaml")
-# rdt_server.py loads lang_embed.pt from its own directory, so save it there directly.
-SAVE_PATH = os.path.join(REPO_ROOT, "src", "rdt_inference", "lang_embed.pt")
+# rdt_server.py loads lang_embed.pt from its own directory by default -- keep save_path
+# pointed there unless you also change where rdt_server.py looks.
+SAVE_PATH = os.path.join(REPO_ROOT, LANG_EMBED_CONFIG["save_path"])
 
-# Fill this in with the actual instruction for the golf task before running.
-TASK_NAME = "galbot_golf"
-INSTRUCTION = "Move forward"
+TASK_NAME = LANG_EMBED_CONFIG["task_name"]
+INSTRUCTION = LANG_EMBED_CONFIG["instruction"]
 
 # If GPU VRAM is less than 24GB, set this to an existing directory to enable offloading.
-OFFLOAD_DIR = None
+OFFLOAD_DIR = LANG_EMBED_CONFIG["offload_dir"]
 
 
 def main():
-    if INSTRUCTION.startswith("<fill in"):
-        raise ValueError("Set INSTRUCTION to the actual task instruction before running.")
+    if not INSTRUCTION:
+        raise ValueError(
+            "Set 'instruction' in config/precompute_lang_embed.yaml to the actual task "
+            "instruction before running."
+        )
 
     with open(CONFIG_PATH, "r") as fp:
         config = yaml.safe_load(fp)

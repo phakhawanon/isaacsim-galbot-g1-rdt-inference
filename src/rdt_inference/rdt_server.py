@@ -10,6 +10,12 @@ environment) -- NOT through isaaclab.sh, and NOT in the `isaaclab` conda env:
 the wrapper script above handles that; don't run this file directly with `python
 rdt_server.py`.)
 
+The model checkpoint, vision encoder, and rdt-1b-galbot checkout location are read
+from config/rdt_server.yaml (repo root), not hardcoded here -- see that file, or
+README.md's "Selecting the RDT-1B model" section, to point this server at a
+different checkpoint. Override with RDT_SERVER_CONFIG=/path/to/other.yaml to avoid
+editing the default config in place.
+
 main.py (running in the isaaclab env) connects to this server over TCP and never
 imports any RDT-specific package directly, so the two conda environments'
 conflicting torch/CUDA versions never need to coexist in one process. Because the
@@ -39,9 +45,13 @@ from .rdt_ipc import (  # noqa: E402
     send_msg,
 )
 
-RDT_ROOT = os.path.normpath(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "rdt-1b-galbot")
-)
+REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+CONFIG_PATH = os.environ.get("RDT_SERVER_CONFIG", os.path.join(REPO_ROOT, "config", "rdt_server.yaml"))
+
+with open(CONFIG_PATH, "r") as fp:
+    SERVER_CONFIG = yaml.safe_load(fp)
+
+RDT_ROOT = os.path.normpath(os.path.join(REPO_ROOT, SERVER_CONFIG["rdt_root"]))
 sys.path.insert(0, RDT_ROOT)
 
 from scripts.galbot_model import create_model  # noqa: E402
@@ -67,9 +77,9 @@ def load_policy():
     policy = create_model(
         args=rdt_config,
         dtype=torch.bfloat16,
-        pretrained=os.path.join(RDT_ROOT, "checkpoints", "rdt-1b-finetune", "checkpoint-70000"),
-        pretrained_vision_encoder_name_or_path="google/siglip-so400m-patch14-384",
-        control_frequency=30,
+        pretrained=os.path.join(RDT_ROOT, SERVER_CONFIG["checkpoint"]),
+        pretrained_vision_encoder_name_or_path=SERVER_CONFIG["vision_encoder"],
+        control_frequency=SERVER_CONFIG["control_frequency"],
     )
 
     lang_embed_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lang_embed.pt")
